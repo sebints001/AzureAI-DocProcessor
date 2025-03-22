@@ -50,6 +50,7 @@ stages:
               backendAzureRmStorageAccountName: $(terraformBackendStorageAccount)
               backendAzureRmContainerName: $(terraformBackendContainer)
               backendAzureRmKey: $(terraformBackendKey)
+              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
           - task: TerraformTaskV4@4
             displayName: validate
             inputs:
@@ -75,15 +76,18 @@ stages:
               backendAzureRmStorageAccountName: $(terraformBackendStorageAccount)
               backendAzureRmContainerName: $(terraformBackendContainer)
               backendAzureRmKey: $(terraformBackendKey)
+              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
           - task: TerraformTaskV4@4
             displayName: plan
             inputs:
               provider: 'azurerm'
               command: 'plan'
               environmentServiceNameAzureRM: $(azureServiceConnection)
+              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
           - task: TerraformTaskV4@4
             displayName: apply
             inputs:
               provider: 'azurerm'
               command: 'apply'
               environmentServiceNameAzureRM: $(azureServiceConnection)
+              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
