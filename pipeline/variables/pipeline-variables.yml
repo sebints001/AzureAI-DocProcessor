@@ -2,7 +2,7 @@ variables:
   - name: azureServiceConnection
     value: DevServiceConnection
   - name: terraformBackendStorageAccount
-    value: terraformstatestoragenew001
+    value: terraformstatestorage905
   - name: terraformBackendContainer
     value: terraform-state-container
   - name: terraformBackendKey
