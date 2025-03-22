@@ -50,7 +50,7 @@ stages:
               backendAzureRmStorageAccountName: $(terraformBackendStorageAccount)
               backendAzureRmContainerName: $(terraformBackendContainer)
               backendAzureRmKey: $(terraformBackendKey)
-              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
+              workingDirectory: '$(terraformWorkingDirectory)'
           - task: TerraformTaskV4@4
             displayName: validate
             inputs:
@@ -76,18 +76,20 @@ stages:
               backendAzureRmStorageAccountName: $(terraformBackendStorageAccount)
               backendAzureRmContainerName: $(terraformBackendContainer)
               backendAzureRmKey: $(terraformBackendKey)
-              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
+              workingDirectory: '$(terraformWorkingDirectory)'
           - task: TerraformTaskV4@4
             displayName: plan
             inputs:
               provider: 'azurerm'
               command: 'plan'
               environmentServiceNameAzureRM: $(azureServiceConnection)
-              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
+              workingDirectory: '$(terraformWorkingDirectory)'
+              commandOptions: -var tfstate_rgname=$(terraformBackendResourceGroup) -var tfstate_storageaccname=$(terraformBackendStorageAccount) -var tfstate_containername=$(terraformBackendContainer) -var tfstate_storagekey=$(terraformBackendKey)
           - task: TerraformTaskV4@4
             displayName: apply
             inputs:
               provider: 'azurerm'
               command: 'apply'
               environmentServiceNameAzureRM: $(azureServiceConnection)
-              workingDirectory: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
+              workingDirectory: '$(terraformWorkingDirectory)'
+              commandOptions: -var tfstate_rgname=$(terraformBackendResourceGroup) -var tfstate_storageaccname=$(terraformBackendStorageAccount) -var tfstate_containername=$(terraformBackendContainer) -var tfstate_storagekey=$(terraformBackendKey)

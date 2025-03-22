@@ -9,3 +9,5 @@ variables:
     value: terraform.tfstate
   - name: terraformBackendResourceGroup
     value: terraform-state-rg
+  - name: terraformWorkingDirectory
+    value: '$(Build.SourcesDirectory)/pipeline/infrastructure/terraform'
