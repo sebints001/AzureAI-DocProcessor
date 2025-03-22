@@ -1,0 +1,90 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - name: template-variables
+    value: ../../variables/pipeline-variables.yml
+  
+stages:
+  - stage: Terraform_Deployment
+    displayName: 'Terraform Deployment'
+    jobs:
+      - job: PrepareInfrastructure
+        displayName: "Create Terraform State Storage"
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Create Terraform Backend Storage'  
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az login --service-principal -u $(terraformBackendClient) -p $(terraformBackendSecret) --tenant $(terraformBackendTenant)
+                az account set --subscription $(terraformBackendSubscription)
+                az group create --name $(terraformBackendResourceGroup) --location eastus
+                az storage account create --name $(terraformBackendStorageAccount) --resource-group $(terraformBackendResourceGroup) --location eastus --sku Standard_LRS
+                az storage container create --name $(terraformBackendContainer) --account-name $(terraformBackendStorageAccount)
+                az storage account keys list --resource-group $(terraformBackendResourceGroup) --account-name $(terraformBackendStorageAccount) --query "[0].value" -o tsv
+  - stage: tfValidate
+    jobs:
+      - job: validate
+        continueOnError: false
+        steps:
+          - task: TerraformInstaller@1
+            displayName: tfinstall
+            inputs:
+              terraformVersion: 'latest'
+          - task: TerraformTaskV4@4
+            displayName: init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: $(azureServiceConnection)
+              backendAzureRmResourceGroupName: $(terraformBackendResourceGroup)
+              backendAzureRmStorageAccountName: $(terraformBackendStorageAccount)
+              backendAzureRmContainerName: $(terraformBackendContainer)
+              backendAzureRmKey: $(terraformBackendKey)
+          - task: TerraformTaskV4@4
+            displayName: validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+  - stage: tfDeploy
+    condition: succeeded('tfValidate')
+    dependsOn: tfValidate
+    jobs:
+      - job: apply
+        steps:
+          - task: TerraformInstaller@1
+            displayName: tfinstall
+            inputs:
+              terraformVersion: 'latest'
+          - task: TerraformTaskV4@4
+            displayName: init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: $(azureServiceConnection)
+              backendAzureRmResourceGroupName: $(terraformBackendResourceGroup)
+              backendAzureRmStorageAccountName: $(terraformBackendStorageAccount)
+              backendAzureRmContainerName: $(terraformBackendContainer)
+              backendAzureRmKey: $(terraformBackendKey)
+          - task: TerraformTaskV4@4
+            displayName: plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              environmentServiceNameAzureRM: $(azureServiceConnection)
+          - task: TerraformTaskV4@4
+            displayName: apply
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              environmentServiceNameAzureRM: $(azureServiceConnection)

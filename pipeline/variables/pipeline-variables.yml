@@ -1,0 +1,5 @@
+  azureServiceConnection: 'DevServiceConnection'
+  terraformBackendStorageAccount: 'terraformstatestorage'
+  terraformBackendContainer: 'terraform-state-container'
+  terraformBackendKey: 'terraform.tfstate'
+  terraformBackendResourceGroup: 'terraform-state-rg'
