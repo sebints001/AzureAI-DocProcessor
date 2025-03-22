@@ -73,24 +73,20 @@ variable "environment" {
 variable "tfstate_rgname" {
     description = "The name of the resource group in which the Terraform state will be stored"
     type        = string
-    default = "terraform-state-rg"
 }
 
 variable "tfstate_storageaccname" {
     description = "The name of the storage account in which the Terraform state will be stored"
     type        = string
-    default = "terraformstate905"
 }
 
 variable "tfstate_containername" {
     description = "The name of the container in which the Terraform state will be stored"
     type        = string
-    default = "terraform-state-container"
 }
 
 variable "tfstate_storagekey" {
     description = "The key of the storage account in which the Terraform state will be stored"
     type        = string
-    default = "terraform.tfstate"
 }
 
