@@ -19,3 +19,8 @@ variable "tenant_id" {
   description = "The tenant ID of the key vault"
   type        = string
 }   
+variable "environment" {
+    description = "The environment in which the resources will be created"
+    type        = string
+    default = "dev"
+}
