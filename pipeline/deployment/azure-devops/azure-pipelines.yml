@@ -9,8 +9,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  - name: template-variables
-    value: ../../variables/pipeline-variables.yml
+  - template: ../../variables/pipeline-variables.yml
   
 stages:
   - stage: Terraform_Deployment
